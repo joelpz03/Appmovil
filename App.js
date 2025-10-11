@@ -8,6 +8,11 @@ import Login from "./screens/Login";
 import SignUp from "./screens/SignUp";
 import Home from "./screens/Home";
 import Cursos from "./screens/Cursos";
+import ForgotPassword from "./screens/ForgotPassword";
+import Profile from "./screens/Profile";
+import CarrerasList from "./screens/CarrerasList";
+import AddCarrera from "./screens/AddCarrera";
+import EditCarrera from "./screens/EditCarrera";
 
 const Stack = createNativeStackNavigator();
 
@@ -23,16 +28,21 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
           <>
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Cursos" component={Cursos} />
+            <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="CarrerasList" component={CarrerasList} />
+            <Stack.Screen name="AddCarrera" component={AddCarrera} />
+            <Stack.Screen name="EditCarrera" component={EditCarrera} />
           </>
         ) : (
           <>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="SignUp" component={SignUp} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
           </>
         )}
       </Stack.Navigator>

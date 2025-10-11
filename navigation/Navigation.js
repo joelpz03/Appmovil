@@ -29,6 +29,7 @@ function Navigation() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Cursos" component={Cursos} />
       </Stack.Navigator>
     </NavigationContainer>
   );

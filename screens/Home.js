@@ -1,127 +1,115 @@
-import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, Image, ScrollView, TouchableOpacity } from 'react-native';
-import YoutubePlayer from 'react-native-youtube-iframe';
+import React from "react";
+import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+import { Video } from "expo-av";
 import { signOut } from "firebase/auth";
-import { auth } from '../src/config/firebaseConfig';
+import { auth } from "../src/config/firebaseConfig";
 
-export default function Home({ navigation }) {
+export default function Home() {
+  const navigation = useNavigation();
+  const videoRef = React.useRef(null);
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigation.replace("Login");
     } catch (error) {
-      console.log(error);
+      console.log("Error al cerrar sesión:", error);
     }
   };
 
   return (
-    <ImageBackground
-      source={{ uri: 'https://img.freepik.com/foto-gratis/fondo-desenfocado-interior-escuela_23-2148723407.jpg' }}
-      style={styles.background}
-      blurRadius={5}
-    >
-      <View style={styles.logoContainer}>
-        <Image source={require("../assets/logoenpng.png")} style={styles.logo} />
-      </View>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Instituto del Milagro</Text>
-        
-        <Text style={styles.subtitle}>Bienvenido a la aplicación móvil institucional</Text>
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scroll}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Image source={require("../assets/logoenpng.png")} style={styles.logo} />
+          <Text style={styles.title}>Instituto del Milagro</Text>
+          <Text style={styles.subtitle}>Bienvenido a la aplicación institucional</Text>
+        </View>
 
+        {/* Video */}
         <View style={styles.videoContainer}>
-          <YoutubePlayer height={200} play={false} videoId={'Qg4VitUVPyY'} />
+          <Video
+            ref={videoRef}
+            source={require("../assets/isdm-presentacion.mp4")}
+            style={styles.video}
+            useNativeControls
+            resizeMode="cover"
+            shouldPlay
+            isLooping
+          />
         </View>
 
-        <Text style={styles.sectionTitle}>Noticias</Text>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Inscripciones 2025</Text>
-          <Text>Ya se encuentran abiertas las inscripciones para el ciclo lectivo 2025.</Text>
+        {/* Noticias */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Noticias</Text>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Inscripciones 2025</Text>
+            <Text style={styles.cardText}>
+              Ya se encuentran abiertas las inscripciones para el ciclo lectivo 2025.
+            </Text>
+          </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Eventos próximos</Text>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Acto de fin de curso</Text>
-          <Text>Fecha: 20 de diciembre - 18:00 hs</Text>
+        {/* Eventos */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Eventos próximos</Text>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Acto de fin de curso</Text>
+            <Text style={styles.cardText}>Fecha: 20 de diciembre - 18:00 hs</Text>
+          </View>
         </View>
       </ScrollView>
 
-      {/* BARRA INFERIOR */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity onPress={() => navigation.navigate("Cursos")} style={styles.bottomButton}>
-          <Text style={styles.bottomText}>Cursos</Text>
+      {/* Navbar con íconos */}
+      <View style={styles.navbar}>
+        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+          <Ionicons name="home-outline" size={26} color="#a40000" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogout} style={styles.bottomButton}> 
-          <Text style={styles.bottomText}>Cerrar sesión</Text> 
+        <TouchableOpacity onPress={() => navigation.navigate("Cursos")}>
+          <Ionicons name="book-outline" size={26} color="#333" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+          <Ionicons name="person-outline" size={26} color="#333" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleLogout}>
+          <Ionicons name="log-out-outline" size={26} color="#333" />
         </TouchableOpacity>
       </View>
-    </ImageBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  container: {
-    padding: 20,
-    alignItems: 'center',
-    paddingBottom: 100,
-  },
-  logo: {
-    width: 90, 
-    height: 95,
-    resizeMode: "contain",
-    marginBottom: 10,
-  },
-  
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginVertical: 10,
-    color: '#fff',
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 20,
-    color: '#fff',
-  },
-  videoContainer: {
-    width: '100%',
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 15,
-    color: '#fff',
-  },
+  container: { flex: 1, backgroundColor: "#fff" },
+  scroll: { paddingBottom: 120 },
+  header: { alignItems: "center", marginTop: 60, marginBottom: 25 },
+  logo: { width: 120, height: 120, resizeMode: "contain", marginBottom: 10 },
+  title: { fontSize: 24, fontWeight: "bold", color: "#222" },
+  subtitle: { fontSize: 15, color: "#666", textAlign: "center", marginTop: 4 },
+  videoContainer: { alignItems: "center", marginBottom: 30 },
+  video: { width: "90%", height: 220, borderRadius: 12 },
+  section: { paddingHorizontal: 20, marginBottom: 20 },
+  sectionTitle: { fontSize: 20, fontWeight: "700", marginBottom: 10, color: "#111" },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: "#f9f9f9",
+    borderRadius: 12,
     padding: 15,
-    borderRadius: 10,
-    marginVertical: 10,
-    width: '100%',
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
-  cardTitle: {
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: 'rgba(0,0,0,0.7)',
+  cardTitle: { fontSize: 16, fontWeight: "bold", marginBottom: 5, color: "#222" },
+  cardText: { fontSize: 14, color: "#555" },
+  navbar: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
     paddingVertical: 15,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  bottomButton: {
-    paddingHorizontal: 20,
-  },
-  bottomText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+    backgroundColor: "#fff",
   },
 });

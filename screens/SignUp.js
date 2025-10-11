@@ -1,77 +1,210 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ImageBackground } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../src/config/firebaseConfig";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback,} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-export default function SignUp({ navigation }) {
+export default function SignUp() {
+  const navigation = useNavigation();
+
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const validatePassword = (pass) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
-    return regex.test(pass);
+  const [validations, setValidations] = useState({
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+  });
+
+  const handlePasswordChange = (text) => {
+    setPassword(text);
+    setValidations({
+      length: text.length >= 6,
+      upper: /[A-Z]/.test(text),
+      lower: /[a-z]/.test(text),
+      number: /\d/.test(text),
+    });
   };
 
-  const handleSignUp = () => {
-    if (!nombre || !apellido || !email || !password || !confirmPassword) {
-      Alert.alert("Error", "Todos los campos son obligatorios");
-      return;
-    }
-    if (!validatePassword(password)) {
-      Alert.alert("Error", "La contraseña debe tener mínimo 6 caracteres, una mayúscula y una minúscula");
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Las contraseñas no coinciden");
-      return;
-    }
-
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        Alert.alert("Éxito", "Usuario registrado correctamente");
-      })
-      .catch((error) => {
-        Alert.alert("Error", error.message);
-      });
-  };
+  const passwordsMatch = password && confirmPassword === password;
 
   return (
-
-    <ImageBackground
-          source={{ uri: 'https://i.imgur.com/13yDa3Q.png' }}
-          style={styles.background}
-          blurRadius={5}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
+    >
+      {/* Cierra el teclado al tocar fuera */}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled" 
+          showsVerticalScrollIndicator={false}
         >
-    <View style={styles.container}>
-      <Text style={styles.title}>Crear Cuenta</Text>
+          <Text style={styles.title}>Crear cuenta</Text>
 
-      <TextInput style={styles.input} placeholder="Nombre *" placeholderTextColor="#ccc" value={nombre} onChangeText={setNombre} />
-      <TextInput style={styles.input} placeholder="Apellido *" placeholderTextColor="#ccc" value={apellido} onChangeText={setApellido} />
-      <TextInput style={styles.input} placeholder="Email *" placeholderTextColor="#ccc" value={email} onChangeText={setEmail} keyboardType="email-address" />
-      <TextInput style={styles.input} placeholder="Contraseña *" placeholderTextColor="#ccc" value={password} onChangeText={setPassword} secureTextEntry />
-      <TextInput style={styles.input} placeholder="Confirmar Contraseña *" placeholderTextColor="#ccc" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Nombre</Text>
+            <TextInput
+              style={styles.input}
+              value={nombre}
+              onChangeText={setNombre}
+              placeholder="Tu nombre"
+            />
+          </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Registrarse</Text>
-      </TouchableOpacity>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Apellido</Text>
+            <TextInput
+              style={styles.input}
+              value={apellido}
+              onChangeText={setApellido}
+              placeholder="Tu apellido"
+            />
+          </View>
 
-      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-        <Text style={styles.link}>¿Ya tienes cuenta? Inicia sesión</Text>
-      </TouchableOpacity>
-    </View>
-    </ImageBackground>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Correo electrónico"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+
+          {/* Contraseña */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Contraseña</Text>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={handlePasswordChange}
+              placeholder="Contraseña"
+              secureTextEntry
+            />
+
+            {/* Requisitos dinámicos */}
+            <View style={styles.validationContainer}>
+              <Text style={validations.length ? styles.valid : styles.invalid}>
+                • Mínimo 6 caracteres
+              </Text>
+              <Text style={validations.upper ? styles.valid : styles.invalid}>
+                • Al menos una mayúscula
+              </Text>
+              <Text style={validations.lower ? styles.valid : styles.invalid}>
+                • Al menos una minúscula
+              </Text>
+              <Text style={validations.number ? styles.valid : styles.invalid}>
+                • Al menos un número
+              </Text>
+            </View>
+          </View>
+
+          {/* Confirmar contraseña */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Confirmar contraseña</Text>
+            <TextInput
+              style={styles.input}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              placeholder="Repetí tu contraseña"
+              secureTextEntry
+            />
+            {confirmPassword.length > 0 && (
+              <Text
+                style={passwordsMatch ? styles.matchText : styles.noMatchText}
+              >
+                {passwordsMatch
+                  ? "Las contraseñas coinciden"
+                  : "Las contraseñas no coinciden"}
+              </Text>
+            )}
+          </View>
+
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Registrarse</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.link}>¿Ya tenés cuenta? Iniciá sesión</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  background: { flex: 1, justifyContent: 'center' },
-  container: { alignItems: 'center', padding: 20 },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#fff', marginBottom: 30 },
-  input: { backgroundColor: '#333', color: '#fff', borderRadius: 10, width: '100%', padding: 15, marginBottom: 15 },
-  button: { backgroundColor: '#800000', padding: 15, borderRadius: 10, width: '100%', alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: 'bold' },
-  link: { marginTop: 15, color: '#fff' },
+  container: {
+    flexGrow: 1,
+    justifyContent: "center",
+    padding: 25,
+    backgroundColor: "#fff",
+    paddingTop: 100,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 30,
+    color: "#222",
+  },
+  inputGroup: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#333",
+    marginBottom: 5,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: "#a40000",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 15,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  link: {
+    marginTop: 20,
+    textAlign: "center",
+    color: "#a40000",
+  },
+  validationContainer: {
+    marginTop: 8,
+  },
+  valid: {
+    color: "green",
+    fontSize: 13,
+  },
+  invalid: {
+    color: "red",
+    fontSize: 13,
+  },
+  matchText: {
+    color: "green",
+    fontSize: 13,
+    marginTop: 5,
+  },
+  noMatchText: {
+    color: "red",
+    fontSize: 13,
+    marginTop: 5,
+  },
 });
