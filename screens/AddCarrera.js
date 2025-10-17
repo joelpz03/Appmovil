@@ -1,48 +1,365 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Image, Modal } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
+import { addDoc, collection } from "firebase/firestore";
 import { firestore } from "../src/config/firebaseConfig";
-import { collection, addDoc } from "firebase/firestore";
 
-export default function AddCarrera({ navigation }) {
+export default function AddCarrera() {
+  const navigation = useNavigation();
   const [titulo, setTitulo] = useState("");
   const [duracion, setDuracion] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [modalidad, setModalidad] = useState("");
+  const [turnos, setTurnos] = useState([]);
+  const [informacionClave, setInformacionClave] = useState([]);
+  const [tareas, setTareas] = useState([]);
+  const [planDeEstudios, setPlanDeEstudios] = useState([]);
+  const [imagen, setImagen] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleAdd = () => {
-    if (!titulo || !duracion) {
-      Alert.alert("Error", "Completá todos los campos.");
+  // Estados para modales
+  const [modalVisibleTurno, setModalVisibleTurno] = useState(false);
+  const [modalVisibleInfo, setModalVisibleInfo] = useState(false);
+  const [modalVisibleTarea, setModalVisibleTarea] = useState(false);
+  const [modalVisiblePlan, setModalVisiblePlan] = useState(false);
+
+  // Estados para inputs en modales
+  const [nuevoTurno, setNuevoTurno] = useState("");
+  const [nuevoItemInfo, setNuevoItemInfo] = useState("");
+  const [nuevoItemTarea, setNuevoItemTarea] = useState("");
+  const [nuevoPlan, setNuevoPlan] = useState({ codigo: "", espacio: "", regimen: "" });
+
+  const elegirImagen = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      base64: true,
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      const base64Img = `data:image/jpeg;base64,${result.assets[0].base64}`;
+      setImagen(base64Img);
+    }
+  };
+
+  // TURNOS
+  const agregarTurno = () => {
+    if (!nuevoTurno.trim()) {
+      Alert.alert("Aviso", "Ingresa un turno");
+      return;
+    }
+    setTurnos([...turnos, nuevoTurno]);
+    setNuevoTurno("");
+    setModalVisibleTurno(false);
+  };
+
+  const eliminarTurno = (index) => {
+    setTurnos(turnos.filter((_, i) => i !== index));
+  };
+
+  // INFORMACIÓN CLAVE
+  const agregarItemInfo = () => {
+    if (!nuevoItemInfo.trim()) {
+      Alert.alert("Aviso", "Ingresa información clave");
+      return;
+    }
+    setInformacionClave([...informacionClave, nuevoItemInfo]);
+    setNuevoItemInfo("");
+    setModalVisibleInfo(false);
+  };
+
+  const eliminarItemInfo = (index) => {
+    setInformacionClave(informacionClave.filter((_, i) => i !== index));
+  };
+
+  // TAREAS
+  const agregarItemTarea = () => {
+    if (!nuevoItemTarea.trim()) {
+      Alert.alert("Aviso", "Ingresa una tarea");
+      return;
+    }
+    setTareas([...tareas, nuevoItemTarea]);
+    setNuevoItemTarea("");
+    setModalVisibleTarea(false);
+  };
+
+  const eliminarItemTarea = (index) => {
+    setTareas(tareas.filter((_, i) => i !== index));
+  };
+
+  // PLAN DE ESTUDIOS
+  const agregarItemPlan = () => {
+    if (!nuevoPlan.codigo.trim() || !nuevoPlan.espacio.trim() || !nuevoPlan.regimen.trim()) {
+      Alert.alert("Aviso", "Completa todos los campos");
+      return;
+    }
+    setPlanDeEstudios([...planDeEstudios, { ...nuevoPlan }]);
+    setNuevoPlan({ codigo: "", espacio: "", regimen: "" });
+    setModalVisiblePlan(false);
+  };
+
+  const eliminarItemPlan = (index) => {
+    setPlanDeEstudios(planDeEstudios.filter((_, i) => i !== index));
+  };
+
+  const agregarCarrera = async () => {
+    if (!titulo.trim() || !duracion.trim()) {
+      Alert.alert("Campos incompletos", "Completá el título y la duración.");
       return;
     }
 
-    Alert.alert("Confirmar", "¿Agregar la nueva carrera?", [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Agregar", onPress: async () => {
-        try {
-          await addDoc(collection(firestore, "carreras"), { titulo, duracion });
-          Alert.alert("Listo", "Carrera agregada.");
-          navigation.goBack();
-        } catch (err) {
-          Alert.alert("Error", err.message);
-        }
-      }}
-    ]);
+    try {
+      setLoading(true);
+      await addDoc(collection(firestore, "carreras"), {
+        titulo,
+        duracion,
+        descripcion,
+        modalidad,
+        turnos,
+        informacionClave,
+        tareas,
+        planDeEstudios,
+        imagen: imagen || null,
+      });
+      Alert.alert("Éxito", "La carrera fue agregada correctamente.");
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Agregar Carrera</Text>
-      <TextInput style={styles.input} placeholder="Título" value={titulo} onChangeText={setTitulo} />
-      <TextInput style={styles.input} placeholder="Duración (ej: 4 años)" value={duracion} onChangeText={setDuracion} />
-      <TouchableOpacity style={styles.button} onPress={handleAdd}>
-        <Text style={styles.buttonText}>Agregar</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back-outline" size={28} color="#800000" />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Agregar carrera</Text>
+      </View>
+
+      <TextInput placeholder="Título de la carrera" value={titulo} onChangeText={setTitulo} style={styles.input} />
+      <TextInput placeholder="Duración (ej: 3 años)" value={duracion} onChangeText={setDuracion} style={styles.input} />
+      <TextInput placeholder="Modalidad (Presencial, Virtual...)" value={modalidad} onChangeText={setModalidad} style={styles.input} />
+      <TextInput placeholder="Descripción de la carrera" value={descripcion} onChangeText={setDescripcion} style={[styles.input, styles.textArea]} multiline />
+
+      {/* TURNOS - Estilo de tarjetas */}
+      <Text style={styles.sectionTitle}>Turnos</Text>
+      <View style={styles.chipsContainer}>
+        {turnos.map((turno, index) => (
+          <View key={index} style={styles.chip}>
+            <Text style={styles.chipText}>{turno}</Text>
+            <TouchableOpacity onPress={() => eliminarTurno(index)} style={styles.chipClose}>
+              <Ionicons name="close" size={16} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisibleTurno(true)}>
+        <Ionicons name="add" size={20} color="#800000" />
+        <Text style={styles.addButtonText}>Agregar turno</Text>
       </TouchableOpacity>
-    </View>
+
+      {/* INFORMACIÓN CLAVE */}
+      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Información Clave</Text>
+      {informacionClave.map((item, index) => (
+        <View key={index} style={styles.infoCard}>
+          <View style={styles.infoDot} />
+          <Text style={styles.infoText}>{item}</Text>
+          <TouchableOpacity onPress={() => eliminarItemInfo(index)}>
+            <Ionicons name="close-circle" size={20} color="#d32f2f" />
+          </TouchableOpacity>
+        </View>
+      ))}
+      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisibleInfo(true)}>
+        <Ionicons name="add" size={20} color="#800000" />
+        <Text style={styles.addButtonText}>Agregar información</Text>
+      </TouchableOpacity>
+
+      {/* TAREAS ESPECÍFICAS */}
+      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Tareas Específicas</Text>
+      {tareas.map((tarea, index) => (
+        <View key={index} style={styles.taskItem}>
+          <Text style={styles.taskText}>• {tarea}</Text>
+          <TouchableOpacity onPress={() => eliminarItemTarea(index)}>
+            <Ionicons name="close-circle" size={20} color="#d32f2f" />
+          </TouchableOpacity>
+        </View>
+      ))}
+      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisibleTarea(true)}>
+        <Ionicons name="add" size={20} color="#800000" />
+        <Text style={styles.addButtonText}>Agregar tarea</Text>
+      </TouchableOpacity>
+
+      {/* PLAN DE ESTUDIOS - Tabla */}
+      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Plan de Estudios</Text>
+      {planDeEstudios.length > 0 && (
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeader}>
+            <Text style={[styles.tableCell, styles.tableHeaderText]}>Código</Text>
+            <Text style={[styles.tableCell, styles.tableHeaderText]}>Espacio Curricular</Text>
+            <Text style={[styles.tableCell, styles.tableHeaderText]}>Régimen</Text>
+            <Text style={styles.tableHeaderText}>Acción</Text>
+          </View>
+          {planDeEstudios.map((item, index) => (
+            <View key={index} style={styles.tableRow}>
+              <Text style={styles.tableCell}>{item.codigo}</Text>
+              <Text style={styles.tableCell}>{item.espacio}</Text>
+              <Text style={styles.tableCell}>{item.regimen}</Text>
+              <TouchableOpacity onPress={() => eliminarItemPlan(index)}>
+                <Ionicons name="trash" size={18} color="#d32f2f" />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      )}
+      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisiblePlan(true)}>
+        <Ionicons name="add" size={20} color="#800000" />
+        <Text style={styles.addButtonText}>Agregar materia</Text>
+      </TouchableOpacity>
+
+      {/* IMAGEN */}
+      <TouchableOpacity style={styles.imageButton} onPress={elegirImagen}>
+        <Ionicons name="image-outline" size={22} color="#800000" />
+        <Text style={styles.imageButtonText}>{imagen ? "Cambiar imagen" : "Seleccionar imagen"}</Text>
+      </TouchableOpacity>
+
+      {imagen && <Image source={{ uri: imagen }} style={styles.preview} />}
+
+      {/* BOTÓN GUARDAR */}
+      <TouchableOpacity style={[styles.button, loading && { opacity: 0.6 }]} onPress={agregarCarrera} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? "Agregando..." : "Guardar carrera"}</Text>
+      </TouchableOpacity>
+
+      {/* MODAL TURNO */}
+      <Modal visible={modalVisibleTurno} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Agregar Turno</Text>
+            <TextInput placeholder="Ej: Turno Tarde" value={nuevoTurno} onChangeText={setNuevoTurno} style={styles.input} />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => { setNuevoTurno(""); setModalVisibleTurno(false); }}>
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.confirmButton]} onPress={agregarTurno}>
+                <Text style={styles.confirmButtonText}>Agregar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL INFORMACIÓN */}
+      <Modal visible={modalVisibleInfo} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Agregar Información Clave</Text>
+            <TextInput placeholder="Ingresa información importante" value={nuevoItemInfo} onChangeText={setNuevoItemInfo} style={[styles.input, styles.textArea]} multiline />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => { setNuevoItemInfo(""); setModalVisibleInfo(false); }}>
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.confirmButton]} onPress={agregarItemInfo}>
+                <Text style={styles.confirmButtonText}>Agregar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL TAREA */}
+      <Modal visible={modalVisibleTarea} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Agregar Tarea</Text>
+            <TextInput placeholder="Describe la tarea" value={nuevoItemTarea} onChangeText={setNuevoItemTarea} style={[styles.input, styles.textArea]} multiline />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => { setNuevoItemTarea(""); setModalVisibleTarea(false); }}>
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.confirmButton]} onPress={agregarItemTarea}>
+                <Text style={styles.confirmButtonText}>Agregar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL PLAN DE ESTUDIOS */}
+      <Modal visible={modalVisiblePlan} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Agregar Materia</Text>
+            <TextInput placeholder="Código (ej: 1.01)" value={nuevoPlan.codigo} onChangeText={(text) => setNuevoPlan({ ...nuevoPlan, codigo: text })} style={styles.input} />
+            <TextInput placeholder="Espacio Curricular" value={nuevoPlan.espacio} onChangeText={(text) => setNuevoPlan({ ...nuevoPlan, espacio: text })} style={styles.input} />
+            <TextInput placeholder="Régimen (ej: 1º Cuatrimestre)" value={nuevoPlan.regimen} onChangeText={(text) => setNuevoPlan({ ...nuevoPlan, regimen: text })} style={styles.input} />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => { setNuevoPlan({ codigo: "", espacio: "", regimen: "" }); setModalVisiblePlan(false); }}>
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.confirmButton]} onPress={agregarItemPlan}>
+                <Text style={styles.confirmButtonText}>Agregar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16, backgroundColor: "#fff", flex: 1 },
-  title: { fontSize: 20, fontWeight: "700", color: "#800000", marginBottom: 8 },
-  input: { backgroundColor: "#f5f5f5", padding: 12, borderRadius: 8, marginBottom: 12 },
-  button: { backgroundColor: "#800000", padding: 12, borderRadius: 8, alignItems: "center" },
-  buttonText: { color: "#fff", fontWeight: "700" }
+  container: { flexGrow: 1, backgroundColor: "#fff", padding: 20, paddingTop: 15, paddingBottom: 30 },
+  header: { flexDirection: "row", alignItems: "center", marginBottom: 25 },
+  headerText: { fontSize: 22, fontWeight: "bold", color: "#800000", marginLeft: 15 },
+  input: { borderWidth: 1, borderColor: "#ddd", borderRadius: 8, padding: 12, fontSize: 16, marginBottom: 15, backgroundColor: "#f9f9f9" },
+  textArea: { height: 100, textAlignVertical: "top" },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", color: "#800000", marginBottom: 10 },
+  
+  // Turnos - Chips
+  chipsContainer: { flexDirection: "row", flexWrap: "wrap", marginBottom: 10, gap: 8 },
+  chip: { flexDirection: "row", alignItems: "center", backgroundColor: "#005a6f", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, gap: 6 },
+  chipText: { color: "#fff", fontWeight: "600", fontSize: 14 },
+  chipClose: { padding: 2 },
+
+  // Información Clave
+  infoCard: { flexDirection: "row", alignItems: "center", backgroundColor: "#f5f5f5", padding: 12, borderRadius: 8, marginBottom: 10, borderLeftWidth: 4, borderLeftColor: "#00a8cc" },
+  infoDot: { width: 24, height: 24, borderRadius: 12, backgroundColor: "#00a8cc", marginRight: 10 },
+  infoText: { flex: 1, fontSize: 14, color: "#333", marginRight: 10 },
+
+  // Tareas
+  taskItem: { flexDirection: "row", alignItems: "center", paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: "#eee" },
+  taskText: { flex: 1, fontSize: 14, color: "#333" },
+
+  // Tabla Plan de Estudios
+  tableContainer: { borderWidth: 1, borderColor: "#ddd", borderRadius: 8, overflow: "hidden", marginBottom: 15 },
+  tableHeader: { flexDirection: "row", backgroundColor: "#f0f0f0", paddingHorizontal: 10, paddingVertical: 12, borderBottomWidth: 2, borderBottomColor: "#ddd" },
+  tableHeaderText: { fontWeight: "bold", color: "#333", fontSize: 13 },
+  tableRow: { flexDirection: "row", paddingHorizontal: 10, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: "#eee", alignItems: "center" },
+  tableCell: { flex: 1, fontSize: 13, color: "#555" },
+
+  // Botones
+  addButton: { flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor: "#f0f0f0", paddingVertical: 12, borderRadius: 8, marginBottom: 15, gap: 8 },
+  addButtonText: { color: "#800000", fontWeight: "bold", fontSize: 14 },
+  imageButton: { flexDirection: "row", alignItems: "center", backgroundColor: "#f5f5f5", padding: 12, borderRadius: 8, marginBottom: 15 },
+  imageButtonText: { color: "#800000", marginLeft: 8, fontWeight: "bold" },
+  preview: { width: "100%", height: 180, borderRadius: 10, marginBottom: 15 },
+  button: { backgroundColor: "#800000", borderRadius: 8, paddingVertical: 14, alignItems: "center" },
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
+  modalContent: { backgroundColor: "#fff", padding: 20, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+  modalTitle: { fontSize: 18, fontWeight: "bold", color: "#800000", marginBottom: 15 },
+  modalButtons: { flexDirection: "row", gap: 10, marginTop: 15 },
+  modalButton: { flex: 1, paddingVertical: 12, borderRadius: 8, alignItems: "center" },
+  cancelButton: { backgroundColor: "#f0f0f0" },
+  cancelButtonText: { color: "#666", fontWeight: "bold" },
+  confirmButton: { backgroundColor: "#800000" },
+  confirmButtonText: { color: "#fff", fontWeight: "bold" },
 });

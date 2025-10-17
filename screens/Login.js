@@ -44,7 +44,7 @@ export default function Login({ navigation }) {
             <Text style={styles.label}>Correo</Text>
             <TextInput
               style={styles.input}
-              placeholder="ejemplo@gmail.com"
+              placeholder="Ingresa aquí tu correo"
               placeholderTextColor="#999"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -55,7 +55,7 @@ export default function Login({ navigation }) {
             <Text style={styles.label}>Contraseña</Text>
             <TextInput
               style={styles.input}
-              placeholder="Tu contraseña"
+              placeholder="Ingresa aquí tu contraseña"
               placeholderTextColor="#999"
               secureTextEntry
               value={password}
