@@ -46,6 +46,9 @@ export default function ForgotPassword({ navigation }) {
         <TouchableOpacity style={styles.button} onPress={handleReset}>
           <Text style={styles.buttonText}>Enviar email de recuperación</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Login")}>
+          <Text style={styles.backButtonText}>Volver</Text>
+        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -66,4 +69,13 @@ const styles = StyleSheet.create({
   input: { width: "100%", backgroundColor: "#f5f5f5", padding: 12, borderRadius: 10, marginBottom: 12 },
   button: { width: "100%", backgroundColor: PRIMARY, padding: 14, borderRadius: 10, alignItems: "center", marginTop: 6 },
   buttonText: { color: "#fff", fontWeight: "700" },
+  backButton: {
+    width: "100%",
+    backgroundColor: "#e9e9e9ff",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 12,
+  },
+  backButtonText: { color: PRIMARY, fontWeight: "700" },
 });
