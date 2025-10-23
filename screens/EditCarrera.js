@@ -107,7 +107,7 @@ export default function EditCarrera({ route, navigation }) {
   // TAREAS
   const agregarItemTarea = () => {
     if (!nuevoItemTarea.trim()) {
-      Alert.alert("Aviso", "Ingresa una tarea");
+      Alert.alert("Aviso", "Ingresa un Alcance");
       return;
     }
     setTareas([...tareas, nuevoItemTarea]);
@@ -252,7 +252,7 @@ export default function EditCarrera({ route, navigation }) {
       </TouchableOpacity>
 
       {/* TAREAS */}
-      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Tareas Específicas</Text>
+      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Alcances del Título</Text>
       {tareas.map((tarea, index) => (
         <View key={index} style={styles.taskItem}>
           <Text style={styles.taskText}>• {tarea}</Text>
@@ -263,7 +263,7 @@ export default function EditCarrera({ route, navigation }) {
       ))}
       <TouchableOpacity style={styles.addButton} onPress={() => setModalVisibleTarea(true)}>
         <Ionicons name="add" size={20} color="#800000" />
-        <Text style={styles.addButtonText}>Agregar tarea</Text>
+        <Text style={styles.addButtonText}>Agregar alcance</Text>
       </TouchableOpacity>
 
       {/* PLAN DE ESTUDIOS */}
@@ -354,7 +354,7 @@ export default function EditCarrera({ route, navigation }) {
       <Modal visible={modalVisibleTarea} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Agregar Tarea</Text>
+            <Text style={styles.modalTitle}>Agregar Alcance</Text>
             <TextInput placeholder="Describe la tarea" value={nuevoItemTarea} onChangeText={setNuevoItemTarea} style={[styles.input, styles.textArea]} multiline />
             <View style={styles.modalButtons}>
               <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => { setNuevoItemTarea(""); setModalVisibleTarea(false); }}>

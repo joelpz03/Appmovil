@@ -182,7 +182,7 @@ export default function AddCarrera() {
       </TouchableOpacity>
 
       {/* TAREAS ESPECÍFICAS */}
-      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Tareas Específicas</Text>
+      <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Alcances del Título</Text>
       {tareas.map((tarea, index) => (
         <View key={index} style={styles.taskItem}>
           <Text style={styles.taskText}>• {tarea}</Text>
@@ -193,7 +193,7 @@ export default function AddCarrera() {
       ))}
       <TouchableOpacity style={styles.addButton} onPress={() => setModalVisibleTarea(true)}>
         <Ionicons name="add" size={20} color="#800000" />
-        <Text style={styles.addButtonText}>Agregar tarea</Text>
+        <Text style={styles.addButtonText}>Agregar alcance</Text>
       </TouchableOpacity>
 
       {/* PLAN DE ESTUDIOS - Tabla */}
@@ -276,7 +276,7 @@ export default function AddCarrera() {
       <Modal visible={modalVisibleTarea} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Agregar Tarea</Text>
+            <Text style={styles.modalTitle}>Agregar Alcance</Text>
             <TextInput placeholder="Describe la tarea" value={nuevoItemTarea} onChangeText={setNuevoItemTarea} style={[styles.input, styles.textArea]} multiline />
             <View style={styles.modalButtons}>
               <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={() => { setNuevoItemTarea(""); setModalVisibleTarea(false); }}>
@@ -323,13 +323,13 @@ const styles = StyleSheet.create({
   
   // Turnos - Chips
   chipsContainer: { flexDirection: "row", flexWrap: "wrap", marginBottom: 10, gap: 8 },
-  chip: { flexDirection: "row", alignItems: "center", backgroundColor: "#005a6f", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, gap: 6 },
+  chip: { flexDirection: "row", alignItems: "center", backgroundColor: "#800000", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, gap: 6 },
   chipText: { color: "#fff", fontWeight: "600", fontSize: 14 },
   chipClose: { padding: 2 },
 
   // Información Clave
-  infoCard: { flexDirection: "row", alignItems: "center", backgroundColor: "#f5f5f5", padding: 12, borderRadius: 8, marginBottom: 10, borderLeftWidth: 4, borderLeftColor: "#00a8cc" },
-  infoDot: { width: 24, height: 24, borderRadius: 12, backgroundColor: "#00a8cc", marginRight: 10 },
+  infoCard: { flexDirection: "row", alignItems: "center", backgroundColor: "#f5f5f5", padding: 12, borderRadius: 8, marginBottom: 10, borderLeftWidth: 4, borderLeftColor: "#9F2727" },
+  infoDot: { width: 24, height: 24, borderRadius: 12, backgroundColor: "#BF5F5F", marginRight: 10 },
   infoText: { flex: 1, fontSize: 14, color: "#333", marginRight: 10 },
 
   // Tareas

@@ -10,7 +10,6 @@ export default function Home() {
   const navigation = useNavigation();
   const videoRef = useRef(null);
 
-  // Pausa el video cuando abandonas la pantalla
   useFocusEffect(
     React.useCallback(() => {
       return () => {

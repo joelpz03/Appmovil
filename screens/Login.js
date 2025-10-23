@@ -36,7 +36,7 @@ export default function Login({ navigation }) {
       >
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
-            <Text style={styles.brand}>Instituto del Milagro</Text>
+            <Text style={styles.brand}>Instituto Superior del Milagro</Text>
             <Text style={styles.title}>Iniciar sesión</Text>
           </View>
 

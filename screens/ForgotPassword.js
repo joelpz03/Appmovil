@@ -35,7 +35,7 @@ export default function ForgotPassword({ navigation }) {
         <Text style={styles.label}>Correo</Text>
         <TextInput
           style={styles.input}
-          placeholder="ejemplo@gmail.com"
+          placeholder="Ingresa aquí tu correo"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"

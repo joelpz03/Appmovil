@@ -113,7 +113,7 @@ export default function CarreraDetalle({ route, navigation }) {
       {/* TAREAS ESPECÍFICAS */}
       {carrera.tareas?.length > 0 && (
         <>
-          <Text style={styles.sectionTitle}>Tareas Específicas</Text>
+          <Text style={styles.sectionTitle}>Alcances del Título</Text>
           <Text style={styles.subtitle}>El egresado estará preparado para:</Text>
           {carrera.tareas.map((item, index) => (
             <View key={index} style={styles.taskItem}>
