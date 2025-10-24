@@ -103,8 +103,16 @@ export default function Home() {
             style={styles.menuItem}
             onPress={() => openLink("https://institutodelmilagro.com/campus/mod/page/view.php?id=56598")}
           >
-            <Ionicons name="link-outline" size={22} color="#007B8F" />
+            <Ionicons name="newspaper-outline" size={22} color="#007B8F" />
             <Text style={styles.menuText}>Cronograma / WhatsApp</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("Cursos")}
+          >
+            <Ionicons name="link-outline" size={22} color="#007B8F" />
+            <Text style={styles.menuText}>Ver Carreras</Text>
           </TouchableOpacity>
         </View>
 
