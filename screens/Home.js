@@ -119,8 +119,16 @@ export default function Home() {
             <Ionicons name="link-outline" size={22} color="#007B8F" />
             <Text style={styles.menuText}>Cronograma / WhatsApp</Text>
           </TouchableOpacity>
-        </View>
 
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate("Cursos")}
+          >
+            <Ionicons name="link-outline" size={22} color="#007B8F" />
+            <Text style={styles.menuText}>Ver Carreras</Text>
+          </TouchableOpacity>
+        </View>
+        
         {/* Noticias */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Noticias</Text>

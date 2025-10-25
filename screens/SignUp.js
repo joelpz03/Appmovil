@@ -94,7 +94,7 @@ export default function SignUp() {
               style={styles.input}
               value={nombre}
               onChangeText={handleNombreChange}
-              placeholder="Tu nombre"
+              placeholder="Introduce tu nombre"
             />
           </View>
 
@@ -104,7 +104,7 @@ export default function SignUp() {
               style={styles.input}
               value={apellido}
               onChangeText={handleApellidoChange}
-              placeholder="Tu apellido"
+              placeholder="Introduce tu apellido"
             />
           </View>
 
@@ -114,7 +114,7 @@ export default function SignUp() {
               style={styles.input}
               value={email}
               onChangeText={setEmail}
-              placeholder="Correo electrónico"
+              placeholder="introduce tu correo electrónico"
               keyboardType="email-address"
               autoCapitalize="none"
             />
@@ -128,7 +128,7 @@ export default function SignUp() {
                 style={[styles.input, { flex: 1 }]}
                 value={password}
                 onChangeText={handlePasswordChange}
-                placeholder="Contraseña"
+                placeholder="Introduce tu contraseña"
                 secureTextEntry={!showPassword}
               />
               <TouchableOpacity
@@ -159,7 +159,7 @@ export default function SignUp() {
                 style={[styles.input, { flex: 1 }]}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
-                placeholder="Repetí tu contraseña"
+                placeholder="Confirma tu contraseña"
                 secureTextEntry={!showConfirmPassword}
               />
               <TouchableOpacity
