@@ -1,14 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { SafeAreaView, View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert, ActivityIndicator,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../src/config/firebaseConfig";
+import Navbar from "../components/Navbar";
+
 
 export default function Cursos() {
   const navigation = useNavigation();
   const [carreras, setCarreras] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showNavbar, setShowNavbar] = useState(true);
+  const lastOffset = useRef(0);
+
+  const handleScroll = (event) => {
+  const currentOffset = event.nativeEvent.contentOffset.y;
+  const direction = currentOffset > lastOffset.current ? "down" : "up";
+  lastOffset.current = currentOffset;
+  setShowNavbar(direction !== "down");
+};
+
 
   const cargarCarreras = async () => {
     try {
@@ -53,7 +65,7 @@ export default function Cursos() {
       </View>
 
       {/* Lista de carreras */}
-      <ScrollView  contentContainerStyle={styles.scroll} scrollEnabled={carreras.length > 0} bounces={false}>
+      <ScrollView contentContainerStyle={styles.scroll} scrollEnabled={carreras.length > 0} bounces={false} onScroll={handleScroll} scrollEventThrottle={16} >
         {carreras.length === 0 ? (
           <Text style={{ color: "#666", marginTop: 40 }}>
             No hay carreras registradas.
@@ -100,6 +112,7 @@ export default function Cursos() {
           ))
         )}
       </ScrollView>
+      <Navbar visible={showNavbar} />
     </SafeAreaView>
   );
 }

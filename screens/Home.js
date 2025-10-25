@@ -1,14 +1,26 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Linking,} from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { Video } from "expo-av";
 import { signOut } from "firebase/auth";
 import { auth } from "../src/config/firebaseConfig";
+import Navbar from "../components/Navbar";
+
 
 export default function Home() {
   const navigation = useNavigation();
   const videoRef = useRef(null);
+  const [showNavbar, setShowNavbar] = useState(true);
+  const lastOffset = useRef(0);
+
+  const handleScroll = (event) => {
+  const currentOffset = event.nativeEvent.contentOffset.y;
+  const direction = currentOffset > lastOffset.current ? "down" : "up";
+  lastOffset.current = currentOffset;
+  setShowNavbar(direction !== "down");
+};
+
 
   // Pausa el video cuando abandonas la pantalla
   useFocusEffect(
@@ -46,7 +58,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={styles.scroll} onScroll={handleScroll} scrollEventThrottle={16}>
         {/* Header */}
         <View style={styles.header}>
           <Image
@@ -138,22 +150,7 @@ export default function Home() {
           <Text style={styles.footerSubtext}>© 2025</Text>
         </View>
       </ScrollView>
-
-      {/* Navbar fija */}
-      <View style={styles.navbar}>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Ionicons name="home-outline" size={26} color="#a40000" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Cursos")}>
-          <Ionicons name="book-outline" size={26} color="#333" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-          <Ionicons name="person-outline" size={26} color="#333" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={26} color="#333" />
-        </TouchableOpacity>
-      </View>
+      <Navbar visible={showNavbar} />
     </View>
   );
 }
@@ -218,18 +215,5 @@ const styles = StyleSheet.create({
   footerSubtext: {
     color: "#ccc",
     fontSize: 12,
-  },
-  navbar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingVertical: 15,
-    borderTopWidth: 1,
-    borderTopColor: "#ddd",
-    backgroundColor: "#fff",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
   },
 });
