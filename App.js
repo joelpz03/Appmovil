@@ -43,7 +43,7 @@ export default function App() {
         return; 
       }
       
-      // ✅ Solo aplica delay si NO es la primera carga (esto es para un login normal)
+      // Solo aplica delay si NO es la primera carga (esto es para un login normal)
       if (currentUser && !initializing) {
         setTimeout(() => {
           setUser(currentUser);
