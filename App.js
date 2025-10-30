@@ -36,7 +36,7 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       
-      // CLAVE: Si el flag está activo, ignoramos este evento de autenticación.
+      // Si el flag está activo, ignoramos este evento de autenticación.
       // Esto previene que App.js navegue a Home mientras SignUp.js está en el medio del proceso.
       if (isNavigatingAwayRef.current) {
         console.log("onAuthStateChanged: Evento ignorado debido a isNavigatingAway.");
