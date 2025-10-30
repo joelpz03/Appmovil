@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Linking, Dimensions } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { Video } from "expo-av";
@@ -185,6 +186,7 @@ export default function Home() {
   const currentEvento = eventos[currentEventIndex];
 
   return (
+    <SafeAreaView style={styles.container}>
     <View style={styles.container}>
       <StatusBar style="dark" backgroundColor="#fff" />
       <ScrollView 
@@ -351,6 +353,7 @@ export default function Home() {
 
       <Navbar />
     </View>
+    </SafeAreaView>
   );
 }
 
