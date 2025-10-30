@@ -4,25 +4,29 @@ import { Ionicons } from "@expo/vector-icons";
 
 const PRIMARY = "#800000";
 
-export default function CustomAlert({ visible, title, message, type = "info", onClose }) {
+export default function CustomAlert({
+  visible,
+  title,
+  message,
+  type = "info",
+  onClose,
+  onConfirm,
+  confirmText = "Aceptar",
+  cancelText,
+}) {
   const iconName =
     type === "success"
       ? "checkmark-circle"
       : type === "error"
       ? "close-circle"
+      : type === "warning"
+      ? "alert-circle"
       : "information-circle";
 
   const iconColor =
-    type === "success" ? "#4CAF50" : type === "error" ? "#C62828" : PRIMARY;
-
-  const handleClose = () => {
-    // Pequeño delay para que el usuario vea la animación de cierre
-    setTimeout(() => {
-      if (onClose) {
-        onClose();
-      }
-    }, 200);
-  };
+    type === "success" ? "#4CAF50" :
+    type === "error" ? "#C62828" :
+    type === "warning" ? "#E67E22" : PRIMARY;
 
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
@@ -32,9 +36,22 @@ export default function CustomAlert({ visible, title, message, type = "info", on
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.message}>{message}</Text>
 
-          <TouchableOpacity style={styles.button} onPress={handleClose}>
-            <Text style={styles.buttonText}>Aceptar</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonRow}>
+            {cancelText && (
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={onClose}
+              >
+                <Text style={[styles.buttonText, styles.cancelText]}>{cancelText}</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              style={[styles.button, styles.confirmButton]}
+              onPress={onConfirm || onClose}
+            >
+              <Text style={styles.buttonText}>{confirmText}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
@@ -49,7 +66,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   alertBox: {
-    width: "80%",
+    width: "82%",
     backgroundColor: "#fff",
     borderRadius: 16,
     padding: 24,
@@ -63,7 +80,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#181818ff",
+    color: "#181818",
     marginBottom: 8,
     textAlign: "center",
   },
@@ -73,15 +90,30 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 18,
   },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 10,
+  },
   button: {
-    backgroundColor: PRIMARY,
     paddingVertical: 10,
-    paddingHorizontal: 28,
+    paddingHorizontal: 22,
     borderRadius: 10,
+    minWidth: 120,
+    alignItems: "center",
+  },
+  confirmButton: {
+    backgroundColor: PRIMARY,
+  },
+  cancelButton: {
+    backgroundColor: "#eee",
   },
   buttonText: {
-    color: "#fff",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 15,
+    color: "#fff",
+  },
+  cancelText: {
+    color: "#444",
   },
 });

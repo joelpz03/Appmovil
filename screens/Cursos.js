@@ -1,11 +1,20 @@
 import React, { useEffect, useState, useRef } from "react";
-import { SafeAreaView, View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert, ActivityIndicator,} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { collection, getDocs } from "firebase/firestore";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { firestore } from "../src/config/firebaseConfig";
 import Navbar from "../components/Navbar";
-
 
 export default function Cursos() {
   const navigation = useNavigation();
@@ -15,12 +24,11 @@ export default function Cursos() {
   const lastOffset = useRef(0);
 
   const handleScroll = (event) => {
-  const currentOffset = event.nativeEvent.contentOffset.y;
-  const direction = currentOffset > lastOffset.current ? "down" : "up";
-  lastOffset.current = currentOffset;
-  setShowNavbar(direction !== "down");
-};
-
+    const currentOffset = event.nativeEvent.contentOffset.y;
+    const direction = currentOffset > lastOffset.current ? "down" : "up";
+    lastOffset.current = currentOffset;
+    setShowNavbar(direction !== "down");
+  };
 
   const cargarCarreras = async () => {
     try {
@@ -33,6 +41,30 @@ export default function Cursos() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const eliminarCarrera = (id) => {
+    Alert.alert(
+      "Eliminar carrera",
+      "¿Seguro que deseas eliminar esta carrera?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(firestore, "carreras", id));
+              setCarreras((prev) => prev.filter((c) => c.id !== id));
+              Alert.alert("Éxito", "Carrera eliminada correctamente.");
+            } catch (err) {
+              console.error("Error al eliminar carrera:", err);
+              Alert.alert("Error", "No se pudo eliminar la carrera.");
+            }
+          },
+        },
+      ]
+    );
   };
 
   useEffect(() => {
@@ -65,7 +97,12 @@ export default function Cursos() {
       </View>
 
       {/* Lista de carreras */}
-      <ScrollView contentContainerStyle={styles.scroll} scrollEnabled={carreras.length > 0} bounces={false} onScroll={handleScroll} scrollEventThrottle={16} >
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        scrollEnabled={carreras.length > 0}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
         {carreras.length === 0 ? (
           <Text style={{ color: "#666", marginTop: 40 }}>
             No hay carreras registradas.
@@ -75,8 +112,10 @@ export default function Cursos() {
             <TouchableOpacity
               key={carrera.id}
               style={styles.card}
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate("CarreraDetalle", { id: carrera.id })}
+              activeOpacity={0.9}
+              onPress={() =>
+                navigation.navigate("CarreraDetalle", { id: carrera.id })
+              }
             >
               {/* Imagen */}
               {carrera.imagen ? (
@@ -87,25 +126,29 @@ export default function Cursos() {
               <Text style={styles.title}>{carrera.titulo}</Text>
 
               {/* Duración */}
-              {carrera.duracion ? (
-                <Text style={styles.description}>
-                  Duración:{" "}
-                  {String(carrera.duracion)
-                    .toLowerCase()
-                    .includes("año")
+              <Text style={styles.description}>
+                Duración:{" "}
+                {carrera.duracion
+                  ? String(carrera.duracion)
+                      .toLowerCase()
+                      .includes("año")
                     ? carrera.duracion
-                    : `${carrera.duracion} años`}
-                </Text>
-              ) : (
-                <Text style={styles.description}>Duración no especificada</Text>
-              )}
+                    : `${carrera.duracion} años`
+                  : "No especificada"}
+              </Text>
 
-              {/* Botón editar */}
+              {/* Acciones */}
               <View style={styles.actionRow}>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("EditCarrera", { id: carrera.id })}
+                  onPress={() =>
+                    navigation.navigate("EditCarrera", { id: carrera.id })
+                  }
                 >
                   <Ionicons name="create-outline" size={22} color="#800000" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => eliminarCarrera(carrera.id)}>
+                  <Ionicons name="trash-outline" size={22} color="#b30000" />
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
@@ -118,7 +161,7 @@ export default function Cursos() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: "#f8f8f8" },
   fixedHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -138,45 +181,48 @@ const styles = StyleSheet.create({
     color: "#800000",
   },
   scroll: {
-  alignItems: "center",
-  paddingVertical: 20,
-  paddingTop: 15,
-  minHeight: "100%",
-},
+    alignItems: "center",
+    paddingVertical: 20,
+    paddingTop: 15,
+    minHeight: "100%",
+  },
   card: {
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-    padding: 15,
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 18,
     width: "90%",
     alignItems: "center",
     marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowColor: "#800000",
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: "#e0dcdc",
   },
   image: {
     width: "100%",
     height: 150,
-    borderRadius: 8,
-    marginBottom: 10,
+    borderRadius: 10,
+    marginBottom: 12,
   },
   title: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: "bold",
     color: "#800000",
     textAlign: "center",
   },
   description: {
     fontSize: 14,
-    color: "#333",
+    color: "#555",
     textAlign: "center",
     marginTop: 5,
   },
   actionRow: {
     flexDirection: "row",
-    gap: 20,
-    marginTop: 10,
+    justifyContent: "center",
+    gap: 25,
+    marginTop: 12,
   },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 });

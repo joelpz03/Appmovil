@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, TouchableOpacity,} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { firestore } from "../src/config/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { Ionicons } from "@expo/vector-icons";
@@ -43,6 +44,7 @@ export default function CarreraDetalle({ route, navigation }) {
   }
 
   return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back-outline" size={28} color="#800000" />
@@ -144,6 +146,7 @@ export default function CarreraDetalle({ route, navigation }) {
         </>
       )}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
