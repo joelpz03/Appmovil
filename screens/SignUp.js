@@ -65,6 +65,11 @@ export default function SignUp({ setIsNavigatingAway }) {
   }
   };
 
+  const handleEmailChange = (text) => {
+    const textWithoutSpaces = text.replace(/\s/g, '');
+    setEmail(textWithoutSpaces);
+  };
+
   const handlePasswordChange = (text) => {
     setPassword(text);
     setValidations({
@@ -126,10 +131,7 @@ export default function SignUp({ setIsNavigatingAway }) {
       if (setIsNavigatingAway) {
         setIsNavigatingAway(true);
       }
-      
-      //Pequeño delay de sincronización (50ms).
-      //Esto da tiempo a que App.js (el useRef) lea isNavigatingAway=true
-      //ANTES de que el listener de Firebase se active.
+      //Pequeña espera para asegurar que el flag se propague antes de continuar.
       await new Promise(resolve => setTimeout(resolve, 50));
 
       //Crear el usuario (se conecta y dispara onAuthStateChanged)
@@ -262,7 +264,7 @@ export default function SignUp({ setIsNavigatingAway }) {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={handleEmailChange}
                 />
               </View>
 
