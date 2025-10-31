@@ -25,10 +25,8 @@ export default function App() {
   // Estado para indicar que SignUp/Login está realizando una navegación manual (evita el re-render a Home)
   const [isNavigatingAway, setIsNavigatingAway] = useState(false); 
 
-  // Ref para mantener un valor mutable accesible desde el closure del listener de Firebase
   const isNavigatingAwayRef = useRef(isNavigatingAway); 
 
-  // Sincronizar el Ref con el State cada vez que el State cambie
   useEffect(() => {
     isNavigatingAwayRef.current = isNavigatingAway;
   }, [isNavigatingAway]);
@@ -36,14 +34,11 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       
-      // Si el flag está activo, ignoramos este evento de autenticación.
-      // Esto previene que App.js navegue a Home mientras SignUp.js está en el medio del proceso.
       if (isNavigatingAwayRef.current) {
         console.log("onAuthStateChanged: Evento ignorado debido a isNavigatingAway.");
         return; 
       }
       
-      // Solo aplica delay si NO es la primera carga (esto es para un login normal)
       if (currentUser && !initializing) {
         setTimeout(() => {
           setUser(currentUser);
@@ -70,7 +65,6 @@ export default function App() {
       />
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {/* La condición de renderizado sigue usando el state para forzar el re-render */}
           {user && !isNavigatingAway ? (
             <>
               <Stack.Screen name="Home" component={Home} options={{ headerShown: false, unmountOnBlur: false}} />
@@ -83,7 +77,6 @@ export default function App() {
           ) : (
             <>
               <Stack.Screen name="Login" component={Login} />
-              {/* Pasamos la función setIsNavigatingAway al componente SignUp */}
               <Stack.Screen name="SignUp">
                 {(props) => (
                   <SignUp 
