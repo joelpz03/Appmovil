@@ -53,12 +53,16 @@ export default function SignUp({ setIsNavigatingAway }) {
 
   const handleNombreChange = (text) => {
     const soloLetras = text.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+    if (soloLetras.length <= 20) {
     setNombre(soloLetras);
+  }
   };
 
   const handleApellidoChange = (text) => {
     const soloLetras = text.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, "");
+    if (soloLetras.length <= 20) {
     setApellido(soloLetras);
+  }
   };
 
   const handlePasswordChange = (text) => {
