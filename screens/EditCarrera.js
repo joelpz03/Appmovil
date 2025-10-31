@@ -215,9 +215,13 @@ export default function EditCarrera({ route, navigation }) {
         <Text style={styles.headerText}>Editar carrera</Text>
       </View>
 
-      <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Título" />
+      <Text style={styles.label}>Título</Text>
+      <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} placeholder="Título de la Carrera" />
+      <Text style={styles.label}>Duración</Text>
       <TextInput style={styles.input} value={duracion} onChangeText={setDuracion} placeholder="Duración (ej: 3 años)" />
+      <Text style={styles.label}>Modalidad</Text>
       <TextInput style={styles.input} value={modalidad} onChangeText={setModalidad} placeholder="Modalidad (Presencial, Virtual...)" />
+      <Text style={styles.label}>Descripción</Text>
       <TextInput style={[styles.input, styles.textArea]} value={descripcion} onChangeText={setDescripcion} placeholder="Descripción de la carrera" multiline />
 
       {/* TURNOS */}
@@ -401,6 +405,7 @@ const styles = StyleSheet.create({
   input: { borderWidth: 1, borderColor: "#ddd", borderRadius: 8, padding: 12, fontSize: 16, marginBottom: 15, backgroundColor: "#f9f9f9" },
   textArea: { height: 100, textAlignVertical: "top" },
   sectionTitle: { fontSize: 18, fontWeight: "bold", color: "#800000", marginBottom: 10 },
+  label: { width: "100%", fontSize: 14, fontWeight: "600", color: "#800000", marginBottom: 6, marginTop: 4,},
 
   // Turnos
   chipsContainer: { flexDirection: "row", flexWrap: "wrap", marginBottom: 10, gap: 8 },

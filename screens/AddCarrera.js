@@ -145,9 +145,13 @@ export default function AddCarrera() {
         <Text style={styles.headerText}>Agregar carrera</Text>
       </View>
 
+      <Text style={styles.label}>Título</Text>
       <TextInput placeholder="Título de la carrera" value={titulo} onChangeText={setTitulo} style={styles.input} />
+      <Text style={styles.label}>Duración</Text>
       <TextInput placeholder="Duración (ej: 3 años)" value={duracion} onChangeText={setDuracion} style={styles.input} />
+      <Text style={styles.label}>Modalidad</Text>
       <TextInput placeholder="Modalidad (Presencial, Virtual...)" value={modalidad} onChangeText={setModalidad} style={styles.input} />
+      <Text style={styles.label}>Descripción</Text>
       <TextInput placeholder="Descripción de la carrera" value={descripcion} onChangeText={setDescripcion} style={[styles.input, styles.textArea]} multiline />
 
       {/* TURNOS - Estilo de tarjetas */}
@@ -323,6 +327,7 @@ const styles = StyleSheet.create({
   input: { borderWidth: 1, borderColor: "#ddd", borderRadius: 8, padding: 12, fontSize: 16, marginBottom: 15, backgroundColor: "#f9f9f9" },
   textArea: { height: 100, textAlignVertical: "top" },
   sectionTitle: { fontSize: 18, fontWeight: "bold", color: "#800000", marginBottom: 10 },
+  label: { width: "100%", fontSize: 14, fontWeight: "600", color: "#800000", marginBottom: 6, marginTop: 4,},
   
   // Turnos - Chips
   chipsContainer: { flexDirection: "row", flexWrap: "wrap", marginBottom: 10, gap: 8 },

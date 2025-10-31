@@ -379,8 +379,6 @@ export default function SignUp({ setIsNavigatingAway }) {
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
-
-      {/* Custom Alert */}
       <CustomAlert
         visible={alert.visible}
         title={alert.title}

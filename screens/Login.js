@@ -158,7 +158,6 @@ export default function Login({ navigation }) {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Custom Alert */}
       <CustomAlert
         visible={alert.visible}
         title={alert.title}

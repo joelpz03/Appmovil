@@ -1,20 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert, ActivityIndicator,} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { firestore } from "../src/config/firebaseConfig";
 import Navbar from "../components/Navbar";
+import CustomAlert from "../components/CustomAlert";
 
 export default function Cursos() {
   const navigation = useNavigation();
@@ -22,6 +14,15 @@ export default function Cursos() {
   const [loading, setLoading] = useState(true);
   const [showNavbar, setShowNavbar] = useState(true);
   const lastOffset = useRef(0);
+
+  const [alertConfig, setAlertConfig] = useState({
+    visible: false,
+    title: "",
+    message: "",
+    type: "",
+    onConfirm: null,
+    onCancel: null,
+  });
 
   const handleScroll = (event) => {
     const currentOffset = event.nativeEvent.contentOffset.y;
@@ -44,28 +45,39 @@ export default function Cursos() {
   };
 
   const eliminarCarrera = (id) => {
-    Alert.alert(
-      "Eliminar carrera",
-      "¿Seguro que deseas eliminar esta carrera?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteDoc(doc(firestore, "carreras", id));
-              setCarreras((prev) => prev.filter((c) => c.id !== id));
-              Alert.alert("Éxito", "Carrera eliminada correctamente.");
-            } catch (err) {
-              console.error("Error al eliminar carrera:", err);
-              Alert.alert("Error", "No se pudo eliminar la carrera.");
-            }
-          },
-        },
-      ]
-    );
-  };
+  setAlertConfig({
+    visible: true,
+    title: "Eliminar carrera",
+    message: "¿Seguro que deseas eliminar esta carrera?",
+    type: "confirm",
+    showCancel: true,
+    confirmText: "Eliminar",
+    cancelText: "Cancelar",
+    onConfirm: async () => {
+      try {
+        await deleteDoc(doc(firestore, "carreras", id));
+        setCarreras((prev) => prev.filter((c) => c.id !== id));
+        setAlertConfig({
+          visible: true,
+          title: "Éxito",
+          message: "Carrera eliminada correctamente.",
+          type: "success",
+          onConfirm: () => setAlertConfig({ visible: false }),
+        });
+      } catch (err) {
+        console.error("Error al eliminar carrera:", err);
+        setAlertConfig({
+          visible: true,
+          title: "Error",
+          message: "No se pudo eliminar la carrera.",
+          type: "error",
+          onConfirm: () => setAlertConfig({ visible: false }),
+        });
+      }
+    },
+    onClose: () => setAlertConfig({ visible: false }),
+  });
+};
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", cargarCarreras);
@@ -155,6 +167,20 @@ export default function Cursos() {
           ))
         )}
       </ScrollView>
+
+      {/* CustomAlert */}
+      <CustomAlert
+        visible={alertConfig.visible}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        showCancel={alertConfig.showCancel}
+        confirmText={alertConfig.confirmText}
+        cancelText={alertConfig.cancelText}
+        onConfirm={alertConfig.onConfirm}
+        onClose={alertConfig.onClose}
+      />
+
       <Navbar visible={showNavbar} />
     </SafeAreaView>
   );
