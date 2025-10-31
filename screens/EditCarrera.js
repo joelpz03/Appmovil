@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityInd
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { firestore } from "../src/config/firebaseConfig";
-import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function EditCarrera({ route, navigation }) {
@@ -163,25 +163,6 @@ export default function EditCarrera({ route, navigation }) {
     ]);
   };
 
-  const handleDelete = () => {
-    Alert.alert("Eliminar", "¿Seguro que querés eliminar esta carrera?", [
-      { text: "Cancelar", style: "cancel" },
-      {
-        text: "Eliminar",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await deleteDoc(doc(firestore, "carreras", id));
-            Alert.alert("Eliminado", "Carrera eliminada.");
-            navigation.goBack();
-          } catch (err) {
-            Alert.alert("Error", err.message);
-          }
-        },
-      },
-    ]);
-  };
-
   const handleCancel = () => {
     Alert.alert(
       "Descartar cambios",
@@ -307,17 +288,13 @@ export default function EditCarrera({ route, navigation }) {
 
       {imagen && <Image source={{ uri: imagen }} style={styles.preview} />}
 
-      {/* BOTONES GUARDAR/CANCELAR/ELIMINAR */}
+      {/* BOTONES GUARDAR/CANCELAR */}
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Guardar cambios</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.cancelBtn} onPress={handleCancel}>
         <Text style={styles.cancelBtnText}>Cancelar edición</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.deleteBtn} onPress={handleDelete}>
-        <Text style={styles.deleteText}>Eliminar carrera</Text>
       </TouchableOpacity>
 
       {/* MODAL TURNO */}
@@ -437,10 +414,8 @@ const styles = StyleSheet.create({
   preview: { width: "100%", height: 180, borderRadius: 10, marginBottom: 15 },
   button: { backgroundColor: "#800000", borderRadius: 8, paddingVertical: 14, alignItems: "center", marginBottom: 10 },
   buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  cancelBtn: { backgroundColor: "#f0f0f0", borderRadius: 8, paddingVertical: 14, alignItems: "center", marginBottom: 10, borderWidth: 1, borderColor: "#ddd" },
+  cancelBtn: { backgroundColor: "#f0f0f0", borderRadius: 8, paddingVertical: 14, alignItems: "center", marginBottom: 20, borderWidth: 1, borderColor: "#ddd" },
   cancelBtnText: { color: "#666", fontWeight: "bold", fontSize: 16 },
-  deleteBtn: { paddingVertical: 12, alignItems: "center", marginBottom: 20 },
-  deleteText: { color: "red", fontWeight: "bold", fontSize: 16 },
 
   // Modal
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
